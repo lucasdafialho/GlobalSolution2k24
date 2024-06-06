@@ -1,18 +1,21 @@
-import java.util.Scanner;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 public class Usuario {
     private String nome;
     private String email;
     private String senha;
+    private ArrayList<Premio> premios;
+    private Suporte suporte;
+    private ArrayList<Avaliacao> avaliacoes;
 
-    public Usuario() {
-    }
+    private static ArrayList<Usuario> usuariosRegistrados = new ArrayList<>();
 
     public Usuario(String nome, String email, String senha) {
-        setNome(nome);
-        setEmail(email);
-        setSenha(senha);
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.premios = new ArrayList<>();
+        this.avaliacoes = new ArrayList<>();
     }
 
     public String getNome() {
@@ -20,9 +23,6 @@ public class Usuario {
     }
 
     public void setNome(String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
-        }
         this.nome = nome;
     }
 
@@ -31,46 +31,55 @@ public class Usuario {
     }
 
     public void setEmail(String email) {
-        if (email == null || !isValidEmail(email)) {
-            throw new IllegalArgumentException("Email inválido");
-        }
         this.email = email;
     }
 
-    public String getSenha() {
-        return senha;
+    public ArrayList<Premio> getPremios() {
+        return premios;
     }
 
-    public void setSenha(String senha) {
-        if (senha == null || !isValidPassword(senha)) {
-            throw new IllegalArgumentException("Senha inválida. A senha deve ter pelo menos 8 caracteres, incluindo um número e um caractere especial.");
-        }
-        this.senha = senha;
+    public void addPremio(Premio premio) {
+        this.premios.add(premio);
+    }
+
+    public Suporte getSuporte() {
+        return suporte;
+    }
+
+    public void setSuporte(Suporte suporte) {
+        this.suporte = suporte;
+    }
+
+    public ArrayList<Avaliacao> getAvaliacoes() {
+        return avaliacoes;
+    }
+
+    public void addAvaliacao(Avaliacao avaliacao) {
+        this.avaliacoes.add(avaliacao);
     }
 
     public static Usuario login(String email, String senha) {
-        // Aqui você pode adicionar a lógica de autenticação, como consulta ao banco de dados.
-        // Por enquanto, retornando null para indicar que o login falhou.
+        for (Usuario usuario : usuariosRegistrados) {
+            if (usuario.getEmail().equals(email) && usuario.senha.equals(senha)) {
+                return usuario;
+            }
+        }
         return null;
     }
 
     public static Usuario registro(String nome, String email, String senha) {
-        return new Usuario(nome, email, senha);
-    }
-
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        Pattern pat = Pattern.compile(emailRegex);
-        return pat.matcher(email).matches();
-    }
-
-    private boolean isValidPassword(String senha) {
-        if (senha.length() < 8) {
-            return false;
+        for (Usuario usuario : usuariosRegistrados) {
+            if (usuario.getEmail().equals(email)) {
+                throw new IllegalArgumentException("Email já registrado.");
+            }
         }
-        String senhaRegex = "^(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$";
-        Pattern pat = Pattern.compile(senhaRegex);
-        return pat.matcher(senha).matches();
+        Usuario novoUsuario = new Usuario(nome, email, senha);
+        usuariosRegistrados.add(novoUsuario);
+        return novoUsuario;
+    }
+
+    public Postagem escreverPostagem(String titulo, String conteudo) {
+        return new Postagem(titulo, conteudo, this.nome);
     }
 
     @Override
@@ -78,7 +87,9 @@ public class Usuario {
         return "Usuario{" +
                 "nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
-                ", senha='" + senha + '\'' +
+                ", premios=" + premios +
+                ", suporte=" + suporte +
+                ", avaliacoes=" + avaliacoes +
                 '}';
     }
 }
