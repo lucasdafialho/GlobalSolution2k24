@@ -4,6 +4,8 @@ import java.util.regex.Pattern;
 
 public class LoginOuRegistro {
     private static final Scanner scanner = new Scanner(System.in);
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^(.+)@(.+)$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
 
     public Usuario loginOuRegistro() {
         System.out.println("1. Login");
@@ -27,19 +29,14 @@ public class LoginOuRegistro {
         Usuario usuario = null;
 
         while (!loginSucesso) {
-            System.out.print("Digite seu email (formato: exemplo@dominio.com): ");
+            System.out.print("Digite seu email: ");
             String email = scanner.nextLine();
-            if (!isValidEmail(email)) {
-                System.out.println("Email inválido. O email deve estar no formato 'exemplo@dominio.com'. Tente novamente.");
+            if (!validarEmail(email)) {
+                System.out.println("Email inválido. Tente novamente.");
                 continue;
             }
-
-            System.out.print("Digite sua senha (mínimo 8 caracteres, incluindo pelo menos um dígito, uma letra minúscula, uma letra maiúscula e um caractere especial): ");
+            System.out.print("Digite sua senha: ");
             String senha = scanner.nextLine();
-            if (!isValidSenha(senha)) {
-                System.out.println("Senha inválida. A senha deve conter pelo menos um dígito, uma letra minúscula, uma letra maiúscula, um caractere especial e ter pelo menos 8 caracteres. Tente novamente.");
-                continue;
-            }
 
             usuario = Usuario.login(email, senha);
 
@@ -56,18 +53,19 @@ public class LoginOuRegistro {
     private Usuario registro() {
         System.out.print("Digite seu nome: ");
         String nome = scanner.nextLine();
-        System.out.print("Digite seu email (formato: exemplo@dominio.com): ");
+        System.out.print("Digite seu email: ");
         String email = scanner.nextLine();
-        if (!isValidEmail(email)) {
-            System.out.println("Email inválido. O email deve estar no formato 'exemplo@dominio.com'. Por favor, tente novamente.");
+        if (!validarEmail(email)) {
+            System.out.println("Email inválido. Tente novamente.");
             return null;
         }
 
         while (true) {
-            System.out.print("Digite sua senha (mínimo 8 caracteres, incluindo pelo menos um dígito, uma letra minúscula, uma letra maiúscula e um caractere especial): ");
+            System.out.print("Digite sua senha: ");
             String senha = scanner.nextLine();
-            if (!isValidSenha(senha)) {
-                System.out.println("Senha inválida. A senha deve conter pelo menos um dígito, uma letra minúscula, uma letra maiúscula, um caractere especial e ter pelo menos 8 caracteres. Por favor, tente novamente.");
+
+            if (!validarSenha(senha)) {
+                System.out.println("Senha inválida. A senha deve conter pelo menos 8 caracteres, incluindo maiúsculas, minúsculas, números e caracteres especiais.");
                 continue;
             }
 
@@ -82,17 +80,13 @@ public class LoginOuRegistro {
         }
     }
 
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[\\w-\\.]+@[\\w-\\.]+\\.[a-zA-Z]{2,}$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(email);
+    private boolean validarEmail(String email) {
+        Matcher matcher = EMAIL_PATTERN.matcher(email);
         return matcher.matches();
     }
 
-    private boolean isValidSenha(String senha) {
-        String senhaRegex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$";
-        Pattern pattern = Pattern.compile(senhaRegex);
-        Matcher matcher = pattern.matcher(senha);
+    private boolean validarSenha(String senha) {
+        Matcher matcher = PASSWORD_PATTERN.matcher(senha);
         return matcher.matches();
     }
-}'
+}
